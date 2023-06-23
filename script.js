@@ -36,7 +36,7 @@ function addTask () {
 function click () {
     
    for (let i = 0; i < task.length; i++) {
-    const element = task.item(i);
+    const element = task(i);
     element.addEventListener('click', (i) =>{
          if (element.getAttribute('style') == 'text-decoration: none;') {
             element.style.textDecoration = "line-through";
