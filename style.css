@@ -1,0 +1,16 @@
+.show{
+    display: flex;
+}
+
+.hide{
+    display: none;
+}
+
+.complite{
+    text-decoration: line-through;
+}
+
+li.checked {
+    text-decoration: line-through;
+    text-decoration-color: red;
+  }
