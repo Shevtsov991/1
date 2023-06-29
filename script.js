@@ -1,53 +1,120 @@
 'use strict';
 
-
-
-let firstTask = document.querySelector('#firstTask')
-let input = document.querySelector('input');
+let input = document.querySelector('#TaskText');
 let button = document.querySelector('button');
-const arr = [];
-let text;
-let li ;
-let complite = document.querySelector('#complite');
-let task = document.getElementsByClassName('task');
+let tasksArr = [];
+let completeButton = document.querySelector('#complete');
+let ul = document.querySelector('#tasks');
 
 
 
-function addTask () {
-    text = input.value;   
-    arr.push(text);
-    li = document.createElement('li');
-    li.className = "task";
-    li.style.textDecoration = 'none';
-
-    for (let i = 0; i < arr.length; i++) {
-        li.innerHTML = arr[i];  
-    };
-    
-    tasksList.prepend(li);
-    
-    firstTask.classList.add('hide')
-    firstTask.classList.remove('task')
-    input.value = '';
-    input.focus();
-    click();
+if (localStorage.getItem('tasks')) {
+   tasksArr = JSON.parse(localStorage.getItem('tasks'))
 }
 
-function click () {
-    
-   for (let i = 0; i < task.length; i++) {
-    const element = task[i];
-    element.addEventListener('click', () =>{
-         if (element.getAttribute('style') == 'text-decoration: none;') {
-            element.style.textDecoration = "line-through";
-            
-         } else  {
-            element.style.textDecoration = "none"
-         }
-         console.log(element);
-    })
-   }
+ tasksArr.forEach(Element => {
+    createLi(Element);
+ });
 
-}
+ input.addEventListener('keydown', function(e) {
+   if (e.keyCode === 13) {
+      addTask()
+   }})
 
 button.addEventListener('click', addTask);
+
+completeButton.addEventListener('click', showHide);
+
+function addTask () {
+
+    let text = input.value;  
+
+    if (text == '') {
+      return alert('Вы не написали задачу!');
+    } 
+
+    const taskObj = {
+      id: Date.now(),
+      textTask: text,
+      textDecoration: 'none',
+      className: 'task',
+   }
+
+   tasksArr.push(taskObj);
+   saveLocalStorage();
+   createLi(taskObj)
+    input.value = '';
+    input.focus();
+   
+}
+
+function createLi(Element) {
+
+let li = document.createElement('li');
+    li.id = Element.id;
+    li.className = Element.className;
+    li.style.textDecoration = Element.textDecoration;
+    li.innerHTML = Element.textTask + "  "; 
+    li.addEventListener ('click', taskDone);
+    li.addEventListener('contextmenu', deleteTask)
+    tasks.prepend(li);
+    
+
+}
+
+function taskDone(e) {
+   onmousedown="return false"
+   if (e.target.getAttribute('style') == 'text-decoration: none;') {
+      e.target.style.textDecoration = "line-through";
+
+         const index = tasksArr.findIndex(item => item.id == e.target.id );
+         tasksArr[index].textDecoration = "line-through";
+         saveLocalStorage();
+         
+      } else {
+         onmousedown="return false"
+         e.target.style.textDecoration = "none";
+
+         const index = tasksArr.findIndex(item => item.id == e.target.id );
+         tasksArr[index].textDecoration = "none";
+         saveLocalStorage();  
+      }
+}
+
+function saveLocalStorage() {
+   localStorage.setItem('tasks', JSON.stringify(tasksArr));
+}
+
+function deleteTask(e) {
+   e.target.className = "hide";
+   const index = tasksArr.findIndex(item => item.id == e.target.id );
+         tasksArr[index].className = "hide";
+         saveLocalStorage(); 
+}
+
+ function showHide(){ 
+let h1 = document.querySelector("#h1");
+
+   ul.innerHTML = '';
+
+   tasksArr.forEach (element => {     
+   if(element.className === "hide") {
+      element.className = "task";  
+   } else {  
+      element.className = "hide";     
+   }
+   createLi(element);
+     })
+
+   if (completeButton.innerHTML === 'Удалённые') {
+      completeButton.innerHTML = 'Активные';
+      h1.innerHTML = "Удалённые задачи";
+   } else {
+      completeButton.innerHTML = 'Удалённые';
+      h1.innerHTML = "Активные задачи"; 
+   }
+   console.log(h1.innerHTML);
+   saveLocalStorage();
+ }
+
+
